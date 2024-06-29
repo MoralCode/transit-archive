@@ -17,7 +17,7 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 # Add the cron job
-RUN echo "*/5 * * * * /app/run_watch_file.sh >> /var/log/cron.log 2>&1" > /etc/cron.d/watch_file
+RUN echo "*/5 * * * * python3 /app/watch.py >> /var/log/cron.log 2>&1" > /etc/cron.d/watch_file
 
 # Give execution rights on the cron job
 RUN chmod 0644 /etc/cron.d/watch_file
