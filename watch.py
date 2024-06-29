@@ -6,8 +6,8 @@ from datetime import datetime
 url = 'https://developer.trimet.org/schedule/gtfs.zip'
 
 # Path to store the ETag and Last-Modified information
-etag_file = 'etag.txt'
-last_modified_file = 'last_modified.txt'
+etag_file = 'data/etag.txt'
+last_modified_file = 'data/last_modified.txt'
 
 def convert_last_modified_to_datetime(last_modified_str):
     # Define the format of the Last-Modified date string
@@ -55,7 +55,7 @@ def main():
     if server_etag != local_etag or server_last_modified != local_last_modified:
         print('File has changed, downloading new version...')
         timestamp = convert_last_modified_to_datetime(server_last_modified).strftime('%Y%m%d_%H%M%S')
-        filename = f'{timestamp}.zip'  # Replace '.ext' with the correct file extension
+        filename = f'data/{timestamp}.zip'  # Replace '.ext' with the correct file extension
         download_file(url, filename)
         save_local_file_info(server_etag, server_last_modified)
         print(f'File downloaded and saved as {filename}')
