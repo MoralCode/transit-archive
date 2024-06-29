@@ -9,6 +9,15 @@ url = 'https://developer.trimet.org/schedule/gtfs.zip'
 etag_file = 'etag.txt'
 last_modified_file = 'last_modified.txt'
 
+def convert_last_modified_to_datetime(last_modified_str):
+    # Define the format of the Last-Modified date string
+    date_format = '%a, %d %b %Y %H:%M:%S %Z'
+    
+    # Convert the Last-Modified string to a datetime object
+    last_modified_datetime = datetime.strptime(last_modified_str, date_format)
+    
+    return last_modified_datetime
+
 def get_server_file_info(url):
     response = requests.head(url)
     etag = response.headers.get('ETag')
