@@ -46,7 +46,7 @@ def main():
     if server_etag != local_etag or server_last_modified != local_last_modified:
         print('File has changed, downloading new version...')
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        filename = f'file_{timestamp}.ext'  # Replace '.ext' with the correct file extension
+        filename = f'{timestamp}.zip'  # Replace '.ext' with the correct file extension
         download_file(url, filename)
         save_local_file_info(server_etag, server_last_modified)
         print(f'File downloaded and saved as {filename}')
