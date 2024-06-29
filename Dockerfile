@@ -7,15 +7,14 @@ RUN apt-get update && apt-get install -y cron
 # Set the working directory
 WORKDIR /app
 
-# Copy the Python script and shell script into the container
-COPY watch_file.py .
-COPY run_watch_file.sh .
+RUN mkdir /app/data
 
-# Make the shell script executable
-RUN chmod +x run_watch_file.sh
+# Copy the Python script and shell script into the container
+COPY watch.py .
+COPY requirements.txt .
 
 # Install the requests library
-RUN pip install requests
+RUN pip install -r requirements.txt
 
 # Add the cron job
 RUN echo "*/5 * * * * /app/run_watch_file.sh >> /var/log/cron.log 2>&1" > /etc/cron.d/watch_file
