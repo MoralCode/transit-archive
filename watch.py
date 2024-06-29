@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 # URL of the file to watch
-url = 'http://example.com/file_to_watch'
+url = 'https://developer.trimet.org/schedule/gtfs.zip'
 
 # Path to store the ETag and Last-Modified information
 etag_file = 'etag.txt'
