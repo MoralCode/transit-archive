@@ -80,7 +80,12 @@ def check_feed(url,data_dir, domain):
         save_local_file_info(server_etag, server_last_modified, etag_file, last_modified_file)
 
         with zipfile.ZipFile(filename) as gtfs_contents:
-            feedinfo = gtfs_contents.read('feed_info.txt')
+            # this may not exist....
+            try:
+                feedinfo = gtfs_contents.read('feed_info.txt')
+            except KeyError as e:
+                print(f"File archive could not be updated: {e}")
+                return
             string_data = feedinfo.decode('utf-8')
             # Use StringIO to create a file-like object
             feedFile = io.StringIO(string_data)
