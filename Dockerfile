@@ -13,7 +13,7 @@ RUN pip install -r requirements.txt
 
 COPY watch.py .
 
-ARG CRON_SCHEDULE="* * * * *"
+ARG CRON_SCHEDULE="*/5 * * * *"
 RUN echo "${CRON_SCHEDULE} python3 /app/watch.py --datadir /app/data" | crontab -
 	
 CMD ["crond", "-f", "2>&1"]
