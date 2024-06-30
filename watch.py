@@ -60,7 +60,7 @@ def check_feed(url,data_dir, domain):
         save_local_file_info(server_etag, server_last_modified, etag_file, last_modified_file)
         print(f'File downloaded and saved as {filename}')
     else:
-        print('File has not changed.')
+        print(f'Feed {data_dir.name} has not changed.')
 
 def main():
     parser = argparse.ArgumentParser(description='Watch a file on a web server and download it if it changes.')
