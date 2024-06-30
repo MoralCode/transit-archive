@@ -49,21 +49,27 @@ def save_local_file_info(etag, last_modified, etag_file, last_modified_file):
 
 
 def save_feed_archive_info(archived_feeds_file,feed_start_date, feed_end_date, feed_version, hosting_path, notes=None):
-    if not archived_feeds_file.exists():
-        archived_feeds_file.write_text("feed_start_date,feed_end_date,feed_version,archive_url,archive_note\n")
+    needs_header = not archived_feeds_file.exists()
 
     feed_start_date = feed_start_date or ""
     feed_end_date = feed_end_date or "" 
     feed_version = feed_version or "" 
 
+
     with archived_feeds_file.open("a") as aff:
-        aff.write(','.join([
-            feed_start_date,
-            feed_end_date,
-            feed_version,
-            str(hosting_path),
-            notes if notes is not None else ""
-        ]))
+        fieldnames = ["feed_start_date","feed_end_date","feed_version","archive_url","archive_note"]
+        # https://docs.python.org/3/library/csv.html#csv.unix_dialect
+        writer = csv.DictWriter(aff, fieldnames=fieldnames, dialect='unix')
+        if needs_header:
+            writer.writeheader()
+
+        writer.writerow({
+            "feed_start_date": feed_start_date,
+            "feed_end_date": feed_end_date,
+            "feed_version": feed_version,
+            "archive_url": str(hosting_path),
+            "archive_note": notes.replace('"',"'") if notes is not None else ""
+        })
 
 def download_file(url, filename):
     response = requests.get(url, allow_redirects=True)
@@ -101,6 +107,8 @@ def check_feed(url,data_dir, domain):
                     e_msg = e.message
                 else:
                     e_msg = e
+
+                e_msg = str(e_msg).replace('"', '')
 
                 msg = f"File archive could not be accurately updated with information from the feed: {e_msg}"
                 print(msg)
