@@ -3,9 +3,7 @@ import os
 from datetime import datetime
 import argparse
 from pathlib import Path
-
-# URL of the file to watch
-url = 'https://developer.trimet.org/schedule/gtfs.zip'
+import csv
 
 # Filenames to store the ETag and Last-Modified information. these are used within each feeds sub-datadir 
 ETAG_FILENAME = 'etag.txt'
@@ -67,6 +65,12 @@ def main():
 
     data_dir = Path(args.datadir)
 
+    feeds_file = data_dir / 'feeds.csv'
+
+    with feeds_file.open('r') as feedfile:
+        reader = csv.DictReader(feedfile)
+        for row in reader:
+            check_feed(row["feed_url"], data_dir / row["dirname"])
 
 
 if __name__ == '__main__':
