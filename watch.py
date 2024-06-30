@@ -7,9 +7,9 @@ from pathlib import Path
 # URL of the file to watch
 url = 'https://developer.trimet.org/schedule/gtfs.zip'
 
-# Path to store the ETag and Last-Modified information
-etag_file = 'data/etag.txt'
-last_modified_file = 'data/last_modified.txt'
+# Filenames to store the ETag and Last-Modified information. these are used within each feeds sub-datadir 
+ETAG_FILENAME = 'etag.txt'
+LASTMODIFIED_FILENAME = 'last_modified.txt'
 
 def convert_last_modified_to_datetime(last_modified_str):
     # Define the format of the Last-Modified date string
@@ -67,8 +67,6 @@ def main():
 
     data_dir = Path(args.datadir)
 
-    etag_file = data_dir / 'etag.txt'
-    last_modified_file = data_dir /'last_modified.txt'
 
 
 if __name__ == '__main__':
