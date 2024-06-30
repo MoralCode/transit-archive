@@ -52,6 +52,10 @@ def save_feed_archive_info(archived_feeds_file,feed_start_date, feed_end_date, f
     if not archived_feeds_file.exists():
         archived_feeds_file.write_text("feed_start_date,feed_end_date,feed_version,archive_url,archive_note\n")
 
+    feed_start_date = feed_start_date or ""
+    feed_end_date = feed_end_date or "" 
+    feed_version = feed_version or "" 
+
     with archived_feeds_file.open("a") as aff:
         aff.write(','.join([
             feed_start_date,
@@ -82,15 +86,35 @@ def check_feed(url,data_dir, domain):
         timestamp = convert_last_modified_to_datetime(server_last_modified).strftime('%Y%m%d_%H%M%S')
         filename = data_dir / f'{timestamp}.zip'  # Replace '.ext' with the correct file extension
         download_file(url, filename)
+        #download_file(url, filename)
         save_local_file_info(server_etag, server_last_modified, etag_file, last_modified_file)
+
+        hosting_path = domain / filename
 
         with zipfile.ZipFile(filename) as gtfs_contents:
             # this may not exist....
             try:
                 feedinfo = gtfs_contents.read('feed_info.txt')
             except KeyError as e:
-                print(f"File archive could not be updated: {e}")
+                
+                if hasattr(e, 'message'):
+                    e_msg = e.message
+                else:
+                    e_msg = e
+
+                msg = f"File archive could not be accurately updated with information from the feed: {e_msg}"
+                print(msg)
+
+                fillin_date = convert_last_modified_to_datetime(last_modified)
+                save_feed_archive_info(
+                    archived_feeds_file,
+                    fillin_date.strftime('%Y%m%d'),
+                    fillin_date.strftime('%Y%m%d'),
+                    fillin_date.strftime('%Y%m%d_%H%M%S'),
+                    hosting_path,
+                    notes=f"{msg}. Filling in missing values with the modification date")
                 return
+                
             string_data = feedinfo.decode('utf-8')
             # Use StringIO to create a file-like object
             feedFile = io.StringIO(string_data)
@@ -101,7 +125,6 @@ def check_feed(url,data_dir, domain):
             feed_end_date = info["feed_end_date"]
             feed_version = info["feed_version"]
 
-        hosting_path = domain / filename
 
         save_feed_archive_info(archived_feeds_file, feed_start_date, feed_end_date, feed_version, hosting_path)
         print(f'File downloaded and saved as {filename}')
