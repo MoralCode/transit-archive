@@ -105,7 +105,7 @@ def check_feed(url,data_dir, domain):
                 msg = f"File archive could not be accurately updated with information from the feed: {e_msg}"
                 print(msg)
 
-                fillin_date = convert_last_modified_to_datetime(last_modified)
+                fillin_date = convert_last_modified_to_datetime(server_last_modified)
                 save_feed_archive_info(
                     archived_feeds_file,
                     fillin_date.strftime('%Y%m%d'),
