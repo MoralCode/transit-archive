@@ -1,6 +1,8 @@
 import requests
 import os
 from datetime import datetime
+import argparse
+from pathlib import Path
 
 # URL of the file to watch
 url = 'https://developer.trimet.org/schedule/gtfs.zip'
@@ -24,24 +26,20 @@ def get_server_file_info(url):
     last_modified = response.headers.get('Last-Modified')
     return etag, last_modified
 
-def get_local_file_info():
+def get_local_file_info(etag_file, last_modified_file):
     etag = None
     last_modified = None
-    if os.path.exists(etag_file):
-        with open(etag_file, 'r') as f:
-            etag = f.read().strip()
-    if os.path.exists(last_modified_file):
-        with open(last_modified_file, 'r') as f:
-            last_modified = f.read().strip()
+    if etag_file.exists():
+        etag = etag_file.read_text().strip()
+    if last_modified_file.exists():
+        last_modified = last_modified_file.read_text().strip()
     return etag, last_modified
 
-def save_local_file_info(etag, last_modified):
+def save_local_file_info(etag, last_modified, etag_file, last_modified_file):
     if etag:
-        with open(etag_file, 'w') as f:
-            f.write(etag)
+        etag_file.write_text(etag)
     if last_modified:
-        with open(last_modified_file, 'w') as f:
-            f.write(last_modified)
+       last_modified_file.write_text(last_modified)
 
 def download_file(url, filename):
     response = requests.get(url)
@@ -49,15 +47,27 @@ def download_file(url, filename):
         f.write(response.content)
 
 def main():
+    parser = argparse.ArgumentParser(description='Watch a file on a web server and download it if it changes.')
+    parser.add_argument('url', help='The URL of the file to watch')
+    parser.add_argument('--datadir', default="./data" help='The directory to store data files')
+    args = parser.parse_args()
+
+    url = args.url
+    data_dir = Path(args.datadir)
+
+    etag_file = data_dir / 'etag.txt'
+    last_modified_file = data_dir /'last_modified.txt'
+
+
     server_etag, server_last_modified = get_server_file_info(url)
-    local_etag, local_last_modified = get_local_file_info()
+    local_etag, local_last_modified = get_local_file_info(etag_file, last_modified_file)
 
     if server_etag != local_etag or server_last_modified != local_last_modified:
         print('File has changed, downloading new version...')
         timestamp = convert_last_modified_to_datetime(server_last_modified).strftime('%Y%m%d_%H%M%S')
-        filename = f'data/{timestamp}.zip'  # Replace '.ext' with the correct file extension
+        filename = data_dir / f'{timestamp}.zip'  # Replace '.ext' with the correct file extension
         download_file(url, filename)
-        save_local_file_info(server_etag, server_last_modified)
+        save_local_file_info(server_etag, server_last_modified, etag_file, last_modified_file)
         print(f'File downloaded and saved as {filename}')
     else:
         print('File has not changed.')

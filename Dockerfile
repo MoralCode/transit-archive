@@ -17,6 +17,6 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 ARG CRON_SCHEDULE="* * * * *"
-RUN echo "${CRON_SCHEDULE} python3 /app/watch.py" | crontab -
-
+RUN echo "${CRON_SCHEDULE} python3 /app/watch.py https://developer.trimet.org/schedule/gtfs.zip' /app/data" | crontab -
+	
 CMD ["crond", "-f", "2>&1"]
