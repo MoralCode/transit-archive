@@ -15,20 +15,27 @@ Docker or a reasonably modern version of python3 are needed to run this code
     git clone https://github.com/yourusername/watch-file-downloader.git
     cd watch-file-downloader
     ```
+1. create a directory to store data in, such as `mkdir data`
+1. inside this data directory, create a file called `feeds.csv` with the following content:
+	```csv
+	dirname,feed_url
+	NAME,URL
+	```
+	replace NAME with a directory name you want to use for this feed and URL with the url to the GTFS feed (a .zip file) that you want to start archiving. The file can contain many entries if you want to monitor many feeds.
 
-1. **Build the Docker image**
+2. **Build the Docker image**
 
     ```sh
     docker build -t watch-file-image .
     ```
 
-2. **Run the Docker container**
+3. **Run the Docker container**
 
     ```sh
-    docker run -d --name watch-file-container watch-file-image
+    docker run -d --name watch-file-container -v /path/to/data/directory:/app/data watch-file-image
     ```
 
-The Docker container will now run the Python script every 5 minutes to check for updates to the specified file. If the file has changed, it will be downloaded and saved with a timestamped filename.
+The Docker container will now run the Python script every 5 minutes to check for updates to the specified feeds. If any of the feeds have changed, they will be downloaded to the data directory and saved with a timestamped filename.
 
 ## Customization
 
