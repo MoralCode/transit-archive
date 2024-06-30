@@ -23,24 +23,26 @@ Docker or a reasonably modern version of python3 are needed to run this code
 	```
 	replace NAME with a directory name you want to use for this feed and URL with the url to the GTFS feed (a .zip file) that you want to start archiving. The file can contain many entries if you want to monitor many feeds.
 
-2. **Build the Docker image**
+1. install the python dependencies with `pip install -r requirements.txt`
+1. run the script: `python3 ./watch.py --datadir <path to datadir>` 
+
+If any of the feeds have changed, they will be downloaded to the data directory and saved with a timestamped filename. An entry in a CSV file located at `<data directory from >/<feed name>/archive 
+
+### Cron scheduling through docker
+
+1. to run the script in production on a schedule, use docker to build and run the image
 
     ```sh
     docker build -t watch-file-image .
-    ```
-
-3. **Run the Docker container**
-
-    ```sh
     docker run -d --name watch-file-container -v /path/to/data/directory:/app/data watch-file-image
     ```
 
-The Docker container will now run the Python script every 5 minutes to check for updates to the specified feeds. If any of the feeds have changed, they will be downloaded to the data directory and saved with a timestamped filename.
+The Docker container will now run the Python script every 5 minutes to check for updates to the specified feeds.
 
 ## Customization
 
 - **Check interval**: Modify the cron expression in the Dockerfile (`*/5 * * * *`) to change how often the script checks for updates. For example, `*/10 * * * *` will check every 10 minutes.
-- **Hosting path**: pass the `--domain` arg into the script if you want to publicly host your files. This will allow your domain to be included in the archive list files so that the links work. You will need to configure a web server to serve the files in the data directory separately.
+- **Hosting path**: pass the `--domain` arg into the script (or modify the docker file to include this) if you want to publicly host your files. This will allow your domain to be included in the archive list files so that the links work. You will need to configure a web server to serve the files in the data directory separately.
 
 ## License
 
