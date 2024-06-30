@@ -39,17 +39,8 @@ The Docker container will now run the Python script every 5 minutes to check for
 
 ## Customization
 
-- **URL to watch**: Update the `url` variable in `watch_file.py` with the URL of the file you want to monitor.
 - **Check interval**: Modify the cron expression in the Dockerfile (`*/5 * * * *`) to change how often the script checks for updates. For example, `*/10 * * * *` will check every 10 minutes.
-- **File extension**: Update the file extension in the `download_file` function in `watch_file.py` to match the type of file you are downloading.
-
-## Logs
-
-Logs from the cron job are stored in `/var/log/cron.log` inside the container. You can view the logs by running:
-
-```sh
-docker logs watch-file-container
-```
+- **Hosting path**: pass the `--domain` arg into the script if you want to publicly host your files. This will allow your domain to be included in the archive list files so that the links work. You will need to configure a web server to serve the files in the data directory separately.
 
 ## License
 
