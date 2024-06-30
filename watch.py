@@ -62,6 +62,9 @@ def download_file(url, filename):
         f.write(response.content)
 
 def check_feed(url,data_dir, domain):
+    if not data_dir.exists():
+        data_dir.mkdir()
+
     etag_file = data_dir / ETAG_FILENAME
     last_modified_file = data_dir / LASTMODIFIED_FILENAME
     archived_feeds_file = data_dir / ARCHIVED_FEEDS_FILENAME
