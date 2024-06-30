@@ -46,19 +46,7 @@ def download_file(url, filename):
     with open(filename, 'wb') as f:
         f.write(response.content)
 
-def main():
-    parser = argparse.ArgumentParser(description='Watch a file on a web server and download it if it changes.')
-    parser.add_argument('url', help='The URL of the file to watch')
-    parser.add_argument('--datadir', default="./data", help='The directory to store data files')
-    args = parser.parse_args()
-
-    url = args.url
-    data_dir = Path(args.datadir)
-
-    etag_file = data_dir / 'etag.txt'
-    last_modified_file = data_dir /'last_modified.txt'
-
-
+def check_feed(url, etag_file, last_modified_file):
     server_etag, server_last_modified = get_server_file_info(url)
     local_etag, local_last_modified = get_local_file_info(etag_file, last_modified_file)
 
@@ -71,6 +59,17 @@ def main():
         print(f'File downloaded and saved as {filename}')
     else:
         print('File has not changed.')
+
+def main():
+    parser = argparse.ArgumentParser(description='Watch a file on a web server and download it if it changes.')
+    parser.add_argument('--datadir', default="./data", help='The directory to store data files')
+    args = parser.parse_args()
+
+    data_dir = Path(args.datadir)
+
+    etag_file = data_dir / 'etag.txt'
+    last_modified_file = data_dir /'last_modified.txt'
+
 
 if __name__ == '__main__':
     main()
