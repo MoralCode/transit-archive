@@ -77,6 +77,8 @@ def check_feed(url,data_dir, domain):
         timestamp = convert_last_modified_to_datetime(server_last_modified).strftime('%Y%m%d_%H%M%S')
         filename = data_dir / f'{timestamp}.zip'  # Replace '.ext' with the correct file extension
         download_file(url, filename)
+        save_local_file_info(server_etag, server_last_modified, etag_file, last_modified_file)
+
         with zipfile.ZipFile(filename) as gtfs_contents:
             feedinfo = gtfs_contents.read('feed_info.txt')
             string_data = feedinfo.decode('utf-8')
@@ -90,7 +92,6 @@ def check_feed(url,data_dir, domain):
             feed_version = info["feed_version"]
 
         hosting_path = domain / filename
-        save_local_file_info(server_etag, server_last_modified, etag_file, last_modified_file)
 
         save_feed_archive_info(archived_feeds_file, feed_start_date, feed_end_date, feed_version, hosting_path)
         print(f'File downloaded and saved as {filename}')
