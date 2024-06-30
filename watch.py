@@ -4,10 +4,13 @@ from datetime import datetime
 import argparse
 from pathlib import Path
 import csv
+import zipfile
+import io
 
 # Filenames to store the ETag and Last-Modified information. these are used within each feeds sub-datadir 
 ETAG_FILENAME = 'etag.txt'
 LASTMODIFIED_FILENAME = 'last_modified.txt'
+ARCHIVED_FEEDS_FILENAME = "archived_feeds.txt"
 
 def convert_last_modified_to_datetime(last_modified_str):
     # Define the format of the Last-Modified date string
@@ -39,6 +42,20 @@ def save_local_file_info(etag, last_modified, etag_file, last_modified_file):
     if last_modified:
        last_modified_file.write_text(last_modified)
 
+
+def save_feed_archive_info(archived_feeds_file,feed_start_date, feed_end_date, feed_version, hosting_path):
+    if not archived_feeds_file.exists():
+        archived_feeds_file.write_text("feed_start_date,feed_end_date,feed_version,archive_url,archive_note\n")
+
+    with archived_feeds_file.open("a") as aff:
+        aff.write(','.join([
+            feed_start_date,
+            feed_end_date,
+            feed_version,
+            str(hosting_path),
+            ""
+        ]))
+
 def download_file(url, filename):
     response = requests.get(url)
     with open(filename, 'wb') as f:
@@ -57,7 +74,22 @@ def check_feed(url,data_dir, domain):
         timestamp = convert_last_modified_to_datetime(server_last_modified).strftime('%Y%m%d_%H%M%S')
         filename = data_dir / f'{timestamp}.zip'  # Replace '.ext' with the correct file extension
         download_file(url, filename)
+        with zipfile.ZipFile(filename) as gtfs_contents:
+            feedinfo = gtfs_contents.read('feed_info.txt')
+            string_data = feedinfo.decode('utf-8')
+            # Use StringIO to create a file-like object
+            feedFile = io.StringIO(string_data)
+            reader = csv.DictReader(feedFile)
+            info = list(reader)[0]
+
+            feed_start_date = info["feed_start_date"]
+            feed_end_date = info["feed_end_date"]
+            feed_version = info["feed_version"]
+
+        hosting_path = domain / filename
         save_local_file_info(server_etag, server_last_modified, etag_file, last_modified_file)
+
+        save_feed_archive_info(archived_feeds_file, feed_start_date, feed_end_date, feed_version, hosting_path)
         print(f'File downloaded and saved as {filename}')
     else:
         print(f'Feed {data_dir.name} has not changed.')
@@ -65,6 +97,7 @@ def check_feed(url,data_dir, domain):
 def main():
     parser = argparse.ArgumentParser(description='Watch a file on a web server and download it if it changes.')
     parser.add_argument('--datadir', default="./data", help='The directory to store data files')
+    parser.add_argument('--domain', default="", help='The domain used for accessing the data files. This is written to the archive file every time a feed is updated.')
     args = parser.parse_args()
 
     data_dir = Path(args.datadir)
@@ -74,7 +107,7 @@ def main():
     with feeds_file.open('r') as feedfile:
         reader = csv.DictReader(feedfile)
         for row in reader:
-            check_feed(row["feed_url"], data_dir / row["dirname"])
+            check_feed(row["feed_url"], data_dir / row["dirname"], args.domain)
 
 
 if __name__ == '__main__':
