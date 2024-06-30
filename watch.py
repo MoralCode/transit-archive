@@ -49,7 +49,7 @@ def download_file(url, filename):
 def main():
     parser = argparse.ArgumentParser(description='Watch a file on a web server and download it if it changes.')
     parser.add_argument('url', help='The URL of the file to watch')
-    parser.add_argument('--datadir', default="./data" help='The directory to store data files')
+    parser.add_argument('--datadir', default="./data", help='The directory to store data files')
     args = parser.parse_args()
 
     url = args.url
