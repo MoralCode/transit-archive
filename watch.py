@@ -48,7 +48,7 @@ def save_local_file_info(etag, last_modified, etag_file, last_modified_file):
        last_modified_file.write_text(last_modified)
 
 
-def save_feed_archive_info(archived_feeds_file,feed_start_date, feed_end_date, feed_version, hosting_path):
+def save_feed_archive_info(archived_feeds_file,feed_start_date, feed_end_date, feed_version, hosting_path, notes=None):
     if not archived_feeds_file.exists():
         archived_feeds_file.write_text("feed_start_date,feed_end_date,feed_version,archive_url,archive_note\n")
 
@@ -62,7 +62,7 @@ def save_feed_archive_info(archived_feeds_file,feed_start_date, feed_end_date, f
             feed_end_date,
             feed_version,
             str(hosting_path),
-            ""
+            notes if notes is not None else ""
         ]))
 
 def download_file(url, filename):
