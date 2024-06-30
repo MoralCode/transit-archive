@@ -44,7 +44,11 @@ def download_file(url, filename):
     with open(filename, 'wb') as f:
         f.write(response.content)
 
-def check_feed(url, etag_file, last_modified_file):
+def check_feed(url,data_dir, domain):
+    etag_file = data_dir / ETAG_FILENAME
+    last_modified_file = data_dir / LASTMODIFIED_FILENAME
+    archived_feeds_file = data_dir / ARCHIVED_FEEDS_FILENAME
+
     server_etag, server_last_modified = get_server_file_info(url)
     local_etag, local_last_modified = get_local_file_info(etag_file, last_modified_file)
 
