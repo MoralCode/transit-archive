@@ -23,6 +23,11 @@ def convert_last_modified_to_datetime(last_modified_str):
 
 def get_server_file_info(url):
     response = requests.head(url)
+    if response.status_code >= 300 and response.status_code < 400:
+        print(f"Detected a redirect from configured urls {url} to {response.headers.get('Location')}")
+        print(f"Please update your config to avoid this in future. Working around it")
+        response = requests.head(url, allow_redirects=True)
+
     etag = response.headers.get('ETag')
     last_modified = response.headers.get('Last-Modified')
     return etag, last_modified
@@ -57,7 +62,7 @@ def save_feed_archive_info(archived_feeds_file,feed_start_date, feed_end_date, f
         ]))
 
 def download_file(url, filename):
-    response = requests.get(url)
+    response = requests.get(url, allow_redirects=True)
     with open(filename, 'wb') as f:
         f.write(response.content)
 
