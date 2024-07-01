@@ -127,7 +127,7 @@ def check_feed(url,data_dir, domain):
                     None,
                     hosting_path,
                     fallback_value=fillin_value,
-                    notes=f"{msg}. Filling in missing values with the modification date")
+                    notes=f"{msg}. Filling in missing values with '{fillin_value}'")
                 return
                 
             string_data = feedinfo.decode('utf-8')
