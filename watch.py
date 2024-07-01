@@ -89,7 +89,10 @@ def check_feed(url,data_dir, domain):
 
     if server_etag != local_etag or server_last_modified != local_last_modified:
         print(f'Feed {data_dir.name} has changed, downloading new version...')
-        timestamp = convert_last_modified_to_datetime(server_last_modified).strftime('%Y%m%d_%H%M%S')
+        if server_last_modified is not None:
+            timestamp = convert_last_modified_to_datetime(server_last_modified).strftime('%Y%m%d_%H%M%S')
+        else:
+            timestamp = server_etag
         filename = data_dir / f'{timestamp}.zip'  # Replace '.ext' with the correct file extension
         download_file(url, filename)
         #download_file(url, filename)
