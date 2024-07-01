@@ -122,10 +122,11 @@ def check_feed(url,data_dir, domain):
 
                 save_feed_archive_info(
                     archived_feeds_file,
-                    fillin_date.strftime('%Y%m%d'),
-                    fillin_date.strftime('%Y%m%d'),
-                    fillin_date.strftime('%Y%m%d_%H%M%S'),
+                    None,
+                    None,
+                    None,
                     hosting_path,
+                    fallback_date=fillin_date,
                     notes=f"{msg}. Filling in missing values with the modification date")
                 return
                 
