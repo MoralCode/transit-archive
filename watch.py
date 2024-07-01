@@ -48,12 +48,12 @@ def save_local_file_info(etag, last_modified, etag_file, last_modified_file):
        last_modified_file.write_text(last_modified)
 
 
-def save_feed_archive_info(archived_feeds_file,feed_start_date, feed_end_date, feed_version, hosting_path, fallback_date=None, notes=None):
+def save_feed_archive_info(archived_feeds_file,feed_start_date, feed_end_date, feed_version, hosting_path, fallback_value=None, notes=None):
     needs_header = not archived_feeds_file.exists()
 
-    feed_start_date = feed_start_date or fallback_date.strftime('%Y%m%d') if fallback_date else ""
-    feed_end_date = feed_end_date or fallback_date.strftime('%Y%m%d') if fallback_date else ""
-    feed_version = feed_version or fallback_date.strftime('%Y%m%d_%H%M%S') if fallback_date else ""
+    feed_start_date = feed_start_date or fallback_value or ""
+    feed_end_date = feed_end_date or fallback_value or ""
+    feed_version = feed_version or fallback_value or ""
 
 
     with archived_feeds_file.open("a") as aff:
@@ -102,7 +102,7 @@ def check_feed(url,data_dir, domain):
 
         with zipfile.ZipFile(filename) as gtfs_contents:
 
-            fillin_date = convert_last_modified_to_datetime(server_last_modified)
+            fillin_value = convert_last_modified_to_datetime(server_last_modified).strftime('%Y%m%d_%H%M%S') if server_last_modified is not None else timestamp
             notes = None
 
             # this may not exist....
@@ -126,7 +126,7 @@ def check_feed(url,data_dir, domain):
                     None,
                     None,
                     hosting_path,
-                    fallback_date=fillin_date,
+                    fallback_value=fillin_value,
                     notes=f"{msg}. Filling in missing values with the modification date")
                 return
                 
@@ -149,7 +149,7 @@ def check_feed(url,data_dir, domain):
             notes = "did not exist in the source feed. Filling in missing values with the modification date"
 
 
-        save_feed_archive_info(archived_feeds_file, feed_start_date, feed_end_date, feed_version, hosting_path, fallback_date=fillin_date, notes=notes)
+        save_feed_archive_info(archived_feeds_file, feed_start_date, feed_end_date, feed_version, hosting_path, fallback_value=fillin_value, notes=notes)
 
         print(f'File downloaded and saved as {filename}')
     else:
